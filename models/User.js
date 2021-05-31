@@ -15,7 +15,7 @@ const User = mongoose.model("User", {
     description: { type: String },
     avatar: Object,
   },
-
+  hash: { type: String, required: true },
   salt: { type: String, required: true },
   token: { type: String, required: true },
 });

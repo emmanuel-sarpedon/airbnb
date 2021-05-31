@@ -20,8 +20,6 @@ router.post("/user/signup", async (req, res) => {
 
     const user = await User.findOne({ email: email });
 
-    //res.json(userToFind);
-
     if (user) {
       res.status(400).json({
         error: "This email already has an account",
@@ -43,6 +41,7 @@ router.post("/user/signup", async (req, res) => {
           description: description,
           avatar: null,
         },
+        hash: hash,
         salt: salt,
         token: token,
       });
@@ -60,6 +59,35 @@ router.post("/user/signup", async (req, res) => {
     }
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+});
+
+router.post("/user/log_in", async (req, res) => {
+  try {
+    const { email, password } = req.fields;
+
+    const user = await User.findOne({ email: email });
+
+    if (user) {
+      const hash = SHA256(password + user.salt).toString(encBase64);
+
+      if (hash === user.hash) {
+        res.status(200).json({
+          _id: user._id,
+          token: user.token,
+          email: user.email,
+          username: user.account.username,
+          description: user.account.description,
+          name: user.account.name,
+        });
+      } else {
+        res.status(400).json({ error: "Unauthorized" });
+      }
+    } else {
+      res.status(400).json({ error: "Unauthorized" });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 
