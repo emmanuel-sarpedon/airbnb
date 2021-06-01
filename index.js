@@ -7,13 +7,16 @@ mongoose.connect(process.env.MONGOOSE_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
+  useFindAndModify: false,
 });
 
 const userRoutes = require("./routes/user.js");
+const roomRoutes = require("./routes/room");
 
 const app = express();
 app.use(formidable());
 app.use(userRoutes);
+app.use(roomRoutes);
 
 app.all("*", (req, res) => {
   res.status(400).json({ error: "Page not found" });
