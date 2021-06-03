@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/emmanuel-sarpedon/airbnb#readme",
   "dependencies": {
+    "cloudinary": "^1.25.2",
     "cors": "^2.8.5",
     "crypto-js": "^4.0.0",
     "dotenv": "^9.0.2",

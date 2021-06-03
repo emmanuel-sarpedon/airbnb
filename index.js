@@ -1,7 +1,8 @@
+require("dotenv").config();
+
 const express = require("express");
 const formidable = require("express-formidable");
 const mongoose = require("mongoose");
-require("dotenv").config();
 
 mongoose.connect(process.env.MONGOOSE_URI, {
   useNewUrlParser: true,

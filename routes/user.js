@@ -1,6 +1,9 @@
+require("dotenv").config();
+
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const cloudinary = require("cloudinary").v2;
 
 const SHA256 = require("crypto-js/sha256");
 const encBase64 = require("crypto-js/enc-base64");
@@ -13,6 +16,13 @@ mongoose.connect(process.env.MONGOOSE_URI, {
   useFindAndModify: false,
 });
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const isAuthenticated = require("../middlewares/isAuthenticated");
 const User = require("../models/User");
 
 router.post("/user/signup", async (req, res) => {
@@ -89,6 +99,37 @@ router.post("/user/log_in", async (req, res) => {
     }
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+});
+
+router.put("/user/upload_picture/:id", isAuthenticated, async (req, res) => {
+  try {
+    const userToUpdate = await User.findById(req.params.id);
+    if (userToUpdate.token !== req.user.token) {
+      res
+        .status(400)
+        .json({ message: "Sorry, but you can't update this profile" });
+    } else if (Object.keys(req.files).length === 0) {
+      res.status(400).json({
+        message: "Please, select a picture",
+      });
+    } else {
+      const result = await cloudinary.uploader.upload(req.files.picture.path, {
+        folder: "/airbnb/users/" + userToUpdate._id,
+      });
+
+      userToUpdate.account.avatar = result;
+
+      await userToUpdate.save();
+
+      const userUpdated = await User.findById(req.params.id).select(
+        "account.avatar.url account.avatar.picture_id account.username account.description account.name email rooms"
+      );
+
+      res.status(200).json(userUpdated);
+    }
+  } catch (error) {
+    res.status(400).json(error.message);
   }
 });
 

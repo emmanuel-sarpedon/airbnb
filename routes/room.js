@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
@@ -16,6 +18,8 @@ const Room = require("../models/Room");
 // --- CREATE ---
 router.post("/room/publish", isAuthenticated, async (req, res) => {
   try {
+    const user = await User.findById(req.user._id);
+
     const { title, description, price, lat, lng } = req.fields;
 
     const newRoom = new Room({
@@ -31,6 +35,10 @@ router.post("/room/publish", isAuthenticated, async (req, res) => {
     });
 
     await newRoom.save();
+
+    user.rooms.push(newRoom._id);
+
+    await user.save();
 
     res.json(newRoom);
   } catch (error) {
