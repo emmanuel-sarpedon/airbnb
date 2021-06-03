@@ -133,4 +133,32 @@ router.put("/user/upload_picture/:id", isAuthenticated, async (req, res) => {
   }
 });
 
+router.delete("/user/delete_picture/:id", isAuthenticated, async (req, res) => {
+  try {
+    const userToUpdate = await User.findById(req.params.id);
+    if (userToUpdate.token !== req.user.token) {
+      res
+        .status(400)
+        .json({ message: "Sorry, but you can't update this profile" });
+    } else {
+      await cloudinary.api.delete_resources_by_prefix(
+        "airbnb/users/" + req.user._id
+      );
+
+      await cloudinary.api.delete_folder("airbnb/users/" + req.user._id);
+
+      userToUpdate.account.avatar = null;
+
+      await userToUpdate.save();
+
+      const userUpdated = await User.findById(req.params.id).select(
+        "account email rooms"
+      );
+
+      res.status(200).json(userUpdated);
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 module.exports = router;
