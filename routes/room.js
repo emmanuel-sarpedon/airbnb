@@ -3,12 +3,19 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const cloudinary = require("cloudinary").v2;
 
 mongoose.connect(process.env.MONGOOSE_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
   useFindAndModify: false,
+});
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const isAuthenticated = require("../middlewares/isAuthenticated");
@@ -120,6 +127,37 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
   }
 });
 
+router.put("/room/upload_picture/:id", isAuthenticated, async (req, res) => {
+  try {
+    const roomToUpdate = await Room.findById(req.params.id);
+    const picturesToUpload = Object.keys(req.files);
+    if (picturesToUpload.length === 0) {
+      res.status(400).json({ message: "Please, select at least one picture" });
+    } else if (picturesToUpload.length + roomToUpdate.photos.length > 5) {
+      res.status(400).json({ message: "Five pictures max per room" });
+    } else {
+      for (let i = 0; i < picturesToUpload.length; i++) {
+        const result = await cloudinary.uploader.upload(
+          req.files[picturesToUpload[i]].path,
+          {
+            folder: "airbnb/rooms/" + req.params.id,
+          }
+        );
+
+        roomToUpdate.photos.push({
+          url: result.url,
+          picture_id: result.public_id.split("/").pop(),
+        });
+      }
+
+      await roomToUpdate.save();
+
+      res.json(roomToUpdate);
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 // --- DELETE ---
 router.delete("/room/delete/:id", isAuthenticated, async (req, res) => {
   try {

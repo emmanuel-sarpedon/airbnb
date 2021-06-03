@@ -116,6 +116,7 @@ router.put("/user/upload_picture/:id", isAuthenticated, async (req, res) => {
     } else {
       const result = await cloudinary.uploader.upload(req.files.picture.path, {
         folder: "/airbnb/users/" + userToUpdate._id,
+        public_id: userToUpdate._id,
       });
 
       userToUpdate.account.avatar = result;
