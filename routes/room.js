@@ -130,29 +130,39 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
 router.put("/room/upload_picture/:id", isAuthenticated, async (req, res) => {
   try {
     const roomToUpdate = await Room.findById(req.params.id);
+    const roomOwner = await User.findById(roomToUpdate.user);
     const picturesToUpload = Object.keys(req.files);
-    if (picturesToUpload.length === 0) {
-      res.status(400).json({ message: "Please, select at least one picture" });
-    } else if (picturesToUpload.length + roomToUpdate.photos.length > 5) {
-      res.status(400).json({ message: "Five pictures max per room" });
+
+    if (roomOwner.token !== req.user.token) {
+      res
+        .status(400)
+        .json({ message: "Sorry, but you can't update this offer" });
     } else {
-      for (let i = 0; i < picturesToUpload.length; i++) {
-        const result = await cloudinary.uploader.upload(
-          req.files[picturesToUpload[i]].path,
-          {
-            folder: "airbnb/rooms/" + req.params.id,
-          }
-        );
+      if (picturesToUpload.length === 0) {
+        res
+          .status(400)
+          .json({ message: "Please, select at least one picture" });
+      } else if (picturesToUpload.length + roomToUpdate.photos.length > 5) {
+        res.status(400).json({ message: "Five pictures max per room" });
+      } else {
+        for (let i = 0; i < picturesToUpload.length; i++) {
+          const result = await cloudinary.uploader.upload(
+            req.files[picturesToUpload[i]].path,
+            {
+              folder: "airbnb/rooms/" + req.params.id,
+            }
+          );
 
-        roomToUpdate.photos.push({
-          url: result.url,
-          picture_id: result.public_id.split("/").pop(),
-        });
+          roomToUpdate.photos.push({
+            url: result.url,
+            picture_id: result.public_id.split("/").pop(),
+          });
+        }
+
+        await roomToUpdate.save();
+
+        res.json(roomToUpdate);
       }
-
-      await roomToUpdate.save();
-
-      res.json(roomToUpdate);
     }
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -182,4 +192,5 @@ router.delete("/room/delete/:id", isAuthenticated, async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+
 module.exports = router;
