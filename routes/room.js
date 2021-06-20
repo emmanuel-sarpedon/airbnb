@@ -169,6 +169,7 @@ router.put("/room/upload_picture/:id", isAuthenticated, async (req, res) => {
   }
 });
 // --- DELETE ---
+// Todo : delete pictures in Cloudinary
 router.delete("/room/delete/:id", isAuthenticated, async (req, res) => {
   try {
     const roomToDelete = await Room.findById(req.params.id);
@@ -192,5 +193,40 @@ router.delete("/room/delete/:id", isAuthenticated, async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+
+// Todo : delete picture's path in database
+router.delete(
+  "/room/delete_picture/:roomid",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const roomToUpdate = await Room.findById(req.params.roomid);
+
+      if (!roomToUpdate) {
+        res.status(400).json({ message: "Room not found" });
+      } else {
+        const roomOwner = await User.findById(roomToUpdate.user);
+
+        if (roomOwner.token !== req.user.token) {
+          res
+            .status(400)
+            .json({ message: "Sorry, but you can't delete this offer" });
+        } else {
+          const result = await cloudinary.api.delete_resources_by_prefix(
+            "airbnb/rooms/" + req.params.roomid + "/" + req.fields.picture_id
+          );
+
+          if (Object.keys(result.deleted).length > 0) {
+            res.status(200).json({ message: "Picture Deleted" });
+          } else {
+            res.status(400).json({ error: "Picture not found" });
+          }
+        }
+      }
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+);
 
 module.exports = router;
