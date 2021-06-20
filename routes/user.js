@@ -162,4 +162,5 @@ router.delete("/user/delete_picture/:id", isAuthenticated, async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
 module.exports = router;
