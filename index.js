@@ -24,7 +24,7 @@ app.use(roomRoutes);
 app.get("/", (req, res) => {
   res
     .status(200)
-    .json({ message: "Welcome to my app. Documentation in progress ..." });
+    .json({ message: "Welcome on my app. Documentation in progress ..." });
 });
 
 app.all("*", (req, res) => {
