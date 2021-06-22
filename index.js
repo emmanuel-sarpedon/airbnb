@@ -21,6 +21,12 @@ app.use(formidable());
 app.use(userRoutes);
 app.use(roomRoutes);
 
+app.all("/", (req, res) => {
+  res
+    .status(200)
+    .json({ message: "Welcome to my app. Documentation in progress ..." });
+});
+
 app.all("*", (req, res) => {
   res.status(400).json({ error: "Page not found" });
   console.log("/!\\ Unknown route");
