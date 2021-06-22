@@ -21,7 +21,7 @@ app.use(formidable());
 app.use(userRoutes);
 app.use(roomRoutes);
 
-app.all("/", (req, res) => {
+app.get("/", (req, res) => {
   res
     .status(200)
     .json({ message: "Welcome to my app. Documentation in progress ..." });
