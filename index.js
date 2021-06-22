@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const formidable = require("express-formidable");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 mongoose.connect(process.env.MONGOOSE_URI, {
   useNewUrlParser: true,
@@ -15,6 +16,7 @@ const userRoutes = require("./routes/user.js");
 const roomRoutes = require("./routes/room");
 
 const app = express();
+app.use(cors);
 app.use(formidable());
 app.use(userRoutes);
 app.use(roomRoutes);
