@@ -30,7 +30,7 @@ POST|***/user/signup***|Create a new user in database
     "email": "emmanuel.sarpedon@gmail.com",
     "username": "manu",
     "description": "Emmanuel, 26 ans, développeur",
-    "name": "Emmmanuel"
+    "name": "Emmanuel"
 }
 ```
 
@@ -58,7 +58,7 @@ POST|***/user/signup***|Create a new user in database
     "email": "emmanuel.sarpedon@gmail.com",
     "username": "manu",
     "description": "Emmanuel, 26 ans, développeur",
-    "name": "Emmmanuel"
+    "name": "Emmanuel"
 }
 ```
 
@@ -90,7 +90,7 @@ With Postman, you have to send a ```form-data``` :
 {
     "account": {
         "username": "manu",
-        "name": "Emmmanuel",
+        "name": "Emmanuel",
         "description": "Emmanuel, 26 ans, développeur",
         "avatar": {
             "url": "http://res.cloudinary.com/manu-sarp/image/upload/v1624347415/airbnb/users/60d189ccda4436001572abee/60d189ccda4436001572abee.jpg"

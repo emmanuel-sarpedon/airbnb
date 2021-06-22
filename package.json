@@ -6,7 +6,6 @@
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
-
   },
   "repository": {
     "type": "git",
@@ -27,6 +26,7 @@
     "express": "^4.17.1",
     "express-formidable": "^1.2.0",
     "helmet": "^4.6.0",
+    "markdown": "^0.5.0",
     "mongoose": "^5.12.10",
     "uid2": "^0.0.3"
   }

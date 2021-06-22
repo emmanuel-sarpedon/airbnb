@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+const fs = require("fs");
+const md = require("markdown").markdown;
 const express = require("express");
 const formidable = require("express-formidable");
 const mongoose = require("mongoose");
@@ -24,7 +26,7 @@ app.use(roomRoutes);
 app.get("/", (req, res) => {
   res
     .status(200)
-    .json({ message: "Welcome on my app. Documentation in progress ..." });
+    .redirect("https://github.com/emmanuel-sarpedon/airbnb#readme");
 });
 
 app.all("*", (req, res) => {
