@@ -16,7 +16,7 @@ const userRoutes = require("./routes/user.js");
 const roomRoutes = require("./routes/room");
 
 const app = express();
-app.use(cors);
+app.use(cors());
 app.use(formidable());
 app.use(userRoutes);
 app.use(roomRoutes);
